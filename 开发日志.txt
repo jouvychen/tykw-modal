@@ -1,0 +1,85 @@
+创建项目：
+yarn create vite 项目名
+
+添加路由：
+yarn add vue-router
+
+配置@别名：
+在vite.config.ts下和plugins同级的创建
+resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    }
+  },
+其中path需要安装node环境
+yarn add @types/node
+
+import时忽略拓展名：
+在vite.config.ts下和plugins同级的创建
+resolve: {
+    extensions: ['.vue', '.js', '.jsx', '.ts', '.tsx'],
+  },
+这样后面引入这些文件就不需要添加后缀名了
+
+ts文件用@路径报找不到模块“@/xxxxxx”或其相应的类型声明
+在tsconfig.json文件下进行文件系统路径别名设置
+{
+    "compilerOptions": {
+        "baseUrl": "./", // 解析非相对模块的基础地址，默认是当前目录
+        "paths": { // 路径映射，相对于baseUrl
+          "@/*": [
+            "src/*"
+          ]
+        }
+    }
+}
+
+router.ts等报"无法找到模块“xxx.vue”的声明文件 xxx隐式拥有 “any“ 类型。"
+报错原因: typescript 只能理解 .ts 文件，无法理解 .vue、.js其他文件
+解决方法: 在项目根目录或 src 文件夹下创建一个后缀为 XXX.d.ts 的文件，并写入以下内容:
+declare module '*.vue' {
+  import { ComponentOptions } from 'vue'
+  const componentOptions: ComponentOptions
+  export default componentOptions
+}
+// declare module 'xxx'路径或者模块名, 解决引入js模块识别不到报红问题
+declare module '@/locales/setupI18n'
+
+unplugin-auto-import/vite 自动导入
+参考：https://juejin.cn/post/7086326589897572389
+配了ref等还报红：
+将auto-import.d.ts添加到tsconfig.json中，否则在使用api时会提示未定义
+{
+    "include": [
+        "./auto-imports.d.ts"
+      ]
+}
+
+
+
+
+
+TS类型:
+1、找不到模块“three/examples/jsm/libs/tween.module.min”或其相应的类型声明
+在xx.d.ts下声明
+declare module 'three/examples/jsm/libs/tween.module.min'
+declare module 'three/examples/jsm/libs/lil-gui.module.min'
+
+2、不能将命名空间“TWEEN”用作类型
+使用typeof TWEEN
+
+
+https://discourse.threejs.org/t/web-workers-in-3d-web-applications/5674/20
+
+https://discourse.threejs.org/t/tesseract-open-world-planetary-engine/1473/18
+
+https://threejs.org/examples/webgl_worker_offscreencanvas.html
+
+https://discourse.threejs.org/t/some-of-my-art-works-three-js-is-so-good-to-use/43783
+
+https://sudhir9297.github.io/misfit-product/
+
+
+ts里使用webWorker报：Cannot use import statement outside a module
+new worker时添加: { type: "module" } as any
+new Worker(new URL("./worker/script.ts", import.meta.url), { type: "module" } as any);
